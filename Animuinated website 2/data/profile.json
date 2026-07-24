@@ -1,0 +1,11 @@
+{
+  "logo": "CODE CRAFT",
+  "about": {
+    "badge": "[ 01 // ABOUT ME ]",
+    "title": ["Building", "Powerful", "Software"],
+    "paragraphs": [
+      "I write clean, scalable code and architect robust systems from pixel-perfect frontends to high-performance backends.",
+      "Every function is optimized, every API is reliable, and every deployment is seamless."
+    ]
+  }
+}
