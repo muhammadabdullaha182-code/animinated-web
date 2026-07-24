@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register & Upload - CODE CRAFT</title>
+  <meta name="description" content="Register your developer profile and upload your custom projects to the CODE CRAFT community portfolio.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- Grid Overlay -->
+  <div class="grid-overlay"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar-logo">CODE CRAFT</a>
+    <ul class="navbar-links">
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="register.html" class="nav-btn">Register / Upload</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="page-container">
+    <div class="page-header">
+      <h1 class="page-title">Creator Studio</h1>
+      <p class="page-subtitle">Register your profile and upload custom projects directly from your local PC to share with the developer community.</p>
+    </div>
+
+    <section class="contact-section">
+      <div class="contact-card">
+        <div class="auth-tabs">
+          <button class="auth-tab-btn active" id="btnTabRegister">Register</button>
+          <button class="auth-tab-btn" id="btnTabUpload">Upload Project</button>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerFormWrapper">
+          <h2 class="contact-title" style="margin-bottom: 30px; font-size: clamp(16px, 2vw, 24px);">Create Developer Account</h2>
+          <form class="contact-form" id="registerForm">
+            <div class="form-group">
+              <label for="regName">Full Name</label>
+              <input type="text" id="regName" required placeholder="Jane Doe">
+            </div>
+            <div class="form-group">
+              <label for="regEmail">Email Address</label>
+              <input type="email" id="regEmail" required placeholder="jane@example.com">
+            </div>
+            <div class="form-group">
+              <label for="regPassword">Password</label>
+              <input type="password" id="regPassword" required placeholder="Password">
+            </div>
+            <button type="submit" class="btn-primary" style="align-self: center; cursor: none;">
+              <span class="btn-text">Register Account</span>
+              <span class="btn-arrow">-></span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Upload Form (Unlocked once registered/logged in) -->
+        <div id="uploadFormWrapper" style="display: none;">
+          <h2 class="contact-title" style="margin-bottom: 30px; font-size: clamp(16px, 2vw, 24px);">Upload Project Details</h2>
+          <form class="contact-form" id="projectUploadForm">
+            <div class="form-group">
+              <label for="projName">Project Name</label>
+              <input type="text" id="projName" required placeholder="My Awesome Project">
+            </div>
+            <div class="form-group">
+              <label for="projCategory">Category</label>
+              <input type="text" id="projCategory" required placeholder="e.g. Mobile App, Fullstack Platform">
+            </div>
+            
+            <div class="form-group">
+              <label>Select Project Preview Image from PC</label>
+              <label for="projFile" class="file-input-label">
+                <span class="upload-icon">+</span>
+                <span class="upload-text" id="uploadStatusText">Choose image file...</span>
+                <span class="upload-hint">Drag & drop or browse PNG, JPG or WebP</span>
+              </label>
+              <input type="file" id="projFile" accept="image/*" style="display: none;">
+              <img id="imagePreview" class="upload-preview" alt="Preview">
+            </div>
+
+            <div class="form-group" style="margin-top: 10px;">
+              <label>Select Project Source Code Folder (Run/Inspect code)</label>
+              <label for="projDirInput" class="file-input-label" id="dirInputLabel">
+                <span class="upload-icon">DIR</span>
+                <span class="upload-text" id="dirStatusText">Choose project directory...</span>
+                <span class="upload-hint">Upload folder containing index.html, styles, scripts, etc.</span>
+              </label>
+              <input type="file" id="projDirInput" webkitdirectory directory multiple style="display: none;">
+            </div>
+
+            <button type="submit" class="btn-primary" style="align-self: center; cursor: none;">
+              <span class="btn-text">Publish Project</span>
+              <span class="btn-arrow">-></span>
+            </button>
+          </form>
+        </div>
+
+        <div class="form-success-msg" id="authSuccessMsg">
+          Account registered successfully! Unlocking upload form...
+        </div>
+        <div class="form-success-msg" id="uploadSuccessMsg">
+          Project uploaded successfully! Check the featured projects gallery.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <span class="footer-text">&copy; 2026 CODE CRAFT</span>
+    <a href="projects.html" class="footer-link">View Portfolio Grid -></a>
+  </footer>
+
+  <script src="shared.js"></script>
+  <script>
+    (function () {
+      const btnTabRegister = document.getElementById('btnTabRegister');
+      const btnTabUpload = document.getElementById('btnTabUpload');
+      const registerFormWrapper = document.getElementById('registerFormWrapper');
+      const uploadFormWrapper = document.getElementById('uploadFormWrapper');
+      
+      const registerForm = document.getElementById('registerForm');
+      const projectUploadForm = document.getElementById('projectUploadForm');
+      const projFile = document.getElementById('projFile');
+      const imagePreview = document.getElementById('imagePreview');
+      const uploadStatusText = document.getElementById('uploadStatusText');
+      const projDirInput = document.getElementById('projDirInput');
+      const dirStatusText = document.getElementById('dirStatusText');
+      
+      const authSuccessMsg = document.getElementById('authSuccessMsg');
+      const uploadSuccessMsg = document.getElementById('uploadSuccessMsg');
+
+      let uploadedImageBase64 = '';
+      let uploadedFiles = []; // Storing folder structure: { path, content, isBinary }
+
+      // Check session status on load
+      const session = localStorage.getItem('user_session');
+      if (session) {
+        const user = JSON.parse(session);
+        btnTabRegister.textContent = `User: ${user.name.split(' ')[0]}`;
+        switchTab('upload');
+      }
+
+      // Tab switcher triggers
+      btnTabRegister.addEventListener('click', () => switchTab('register'));
+      btnTabUpload.addEventListener('click', () => {
+        if (!localStorage.getItem('user_session')) {
+          alert('Please register a developer account first to upload projects!');
+          return;
+        }
+        switchTab('upload');
+      });
+
+      function switchTab(tab) {
+        authSuccessMsg.style.display = 'none';
+        uploadSuccessMsg.style.display = 'none';
+
+        if (tab === 'register') {
+          btnTabRegister.classList.add('active');
+          btnTabUpload.classList.remove('active');
+          registerFormWrapper.style.display = 'block';
+          uploadFormWrapper.style.display = 'none';
+        } else {
+          btnTabUpload.classList.add('active');
+          btnTabRegister.classList.remove('active');
+          registerFormWrapper.style.display = 'none';
+          uploadFormWrapper.style.display = 'block';
+        }
+      }
+
+      // Handle file selector conversion to Base64
+      projFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          if (file.size > 2 * 1024 * 1024) {
+            alert('File is too large! Please choose an image smaller than 2MB.');
+            projFile.value = '';
+            uploadStatusText.textContent = 'Choose image file...';
+            imagePreview.style.display = 'none';
+            uploadedImageBase64 = '';
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            uploadedImageBase64 = event.target.result;
+            imagePreview.src = uploadedImageBase64;
+            imagePreview.style.display = 'block';
+            uploadStatusText.textContent = `Selected: ${file.name}`;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Handle directory/folder upload from PC
+      projDirInput.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+
+        dirStatusText.textContent = 'Parsing directory files...';
+        uploadedFiles = [];
+
+        let indexExists = false;
+        let totalSize = 0;
+        const maxTotalSize = 3 * 1024 * 1024; // 3MB maximum folder budget to fit quota
+
+        for (const file of files) {
+          // Ignore heavy system/package folders like node_modules, .git, etc.
+          if (file.webkitRelativePath.includes('node_modules/') || 
+              file.webkitRelativePath.includes('.git/') || 
+              file.webkitRelativePath.includes('.vscode/')) {
+            continue;
+          }
+
+          // Filter for code files or images
+          const extension = file.name.split('.').pop().toLowerCase();
+          const validExtensions = ['html', 'css', 'js', 'json', 'txt', 'svg', 'png', 'jpg', 'jpeg', 'webp'];
+          if (!validExtensions.includes(extension)) {
+            continue; // Skip executables, packages or other binary formats
+          }
+
+          totalSize += file.size;
+          if (totalSize > maxTotalSize) {
+            alert('Selected project directory is too large. Code files and preview folder must be smaller than 3MB in total.');
+            projDirInput.value = '';
+            dirStatusText.textContent = 'Choose project directory...';
+            uploadedFiles = [];
+            return;
+          }
+
+          if (file.name.toLowerCase() === 'index.html') {
+            indexExists = true;
+          }
+
+          // Process file content
+          const isBinary = ['png', 'jpg', 'jpeg', 'webp'].includes(extension);
+          const content = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target.result);
+            if (isBinary) {
+              reader.readAsDataURL(file);
+            } else {
+              reader.readAsText(file);
+            }
+          });
+
+          uploadedFiles.push({
+            path: file.webkitRelativePath,
+            content: content,
+            isBinary: isBinary
+          });
+        }
+
+        if (uploadedFiles.length === 0) {
+          alert('No valid web project files found in the folder. Please include .html, .css, or .js files.');
+          projDirInput.value = '';
+          dirStatusText.textContent = 'Choose project directory...';
+          return;
+        }
+
+        if (!indexExists) {
+          alert('Notice: To run a live preview of this project, make sure it contains an "index.html" file at the root level of the folder.');
+        }
+
+        dirStatusText.textContent = `Folder loaded: ${uploadedFiles.length} files (${Math.round(totalSize/1024)} KB)`;
+      });
+
+      // Submit registration form
+      if (registerForm) {
+        registerForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const name = document.getElementById('regName').value;
+          const email = document.getElementById('regEmail').value;
+
+          localStorage.setItem('user_session', JSON.stringify({ name, email }));
+          btnTabRegister.textContent = `User: ${name.split(' ')[0]}`;
+          authSuccessMsg.style.display = 'block';
+          registerForm.reset();
+
+          setTimeout(() => {
+            switchTab('upload');
+          }, 1200);
+        });
+      }
+
+      // Submit project upload form
+      if (projectUploadForm) {
+        projectUploadForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const name = document.getElementById('projName').value;
+          const category = document.getElementById('projCategory').value;
+
+          if (!uploadedImageBase64) {
+            alert('Please select a project preview image first.');
+            return;
+          }
+
+          const userProjects = JSON.parse(localStorage.getItem('uploaded_projects') || '[]');
+          const nextId = (4 + userProjects.length + 1).toString().padStart(2, '0');
+
+          userProjects.push({
+            id: nextId,
+            name: name,
+            category: category,
+            image: uploadedImageBase64,
+            files: uploadedFiles // Contains relative files array for sandbox execution
+          });
+
+          try {
+            localStorage.setItem('uploaded_projects', JSON.stringify(userProjects));
+            
+            // Fade out the form and redirect to gallery page
+            projectUploadForm.style.transition = 'opacity 0.4s ease';
+            projectUploadForm.style.opacity = '0';
+            
+            setTimeout(() => {
+              projectUploadForm.style.display = 'none';
+              uploadSuccessMsg.style.display = 'block';
+              
+              // Redirect to projects page after short delay so they see the upload list updated
+              setTimeout(() => {
+                window.location.href = 'projects.html';
+              }, 1500);
+            }, 450);
+
+            // Clean input state cache
+            uploadedImageBase64 = '';
+            uploadedFiles = [];
+          } catch (error) {
+            console.error('Storage error:', error);
+            alert('Unable to store folder in localStorage because it exceeds total memory limit. Please upload a smaller code folder or reduce image file sizes.');
+          }
+        });
+      }
+    })();
+  </script>
+
+</body>
+</html>
