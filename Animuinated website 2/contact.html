@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact - CODE CRAFT</title>
+  <meta name="description" content="Get in touch with CODE CRAFT developer studio. Let's build something together.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- Grid Overlay -->
+  <div class="grid-overlay"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar-logo">CODE CRAFT</a>
+    <ul class="navbar-links">
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="register.html" class="nav-btn">Register / Upload</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="page-container">
+    <div class="page-header">
+      <h1 class="page-title">Let's Craft</h1>
+      <p class="page-subtitle">Have an idea, project, or custom build in mind? Send us a message and we'll reply shortly.</p>
+    </div>
+
+    <section class="contact-section">
+      <div class="contact-card">
+        <h2 class="contact-title">Start a Conversation</h2>
+        <form class="contact-form" id="contactForm">
+          <div class="form-group">
+            <label for="clientName">Name</label>
+            <input type="text" id="clientName" required placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label for="clientEmail">Email</label>
+            <input type="email" id="clientEmail" required placeholder="john@example.com">
+          </div>
+          <div class="form-group">
+            <label for="clientMessage">Message</label>
+            <textarea id="clientMessage" rows="6" required placeholder="Tell us about your project..."></textarea>
+          </div>
+          <button type="submit" class="btn-primary" style="align-self: center; cursor: none;">
+            <span class="btn-text">Send Message</span>
+            <span class="btn-arrow">-></span>
+          </button>
+        </form>
+        <div class="form-success-msg" id="successMsg">
+          Message sent successfully. We'll get back to you shortly!
+        </div>
+      </div>
+    </section>
+
+    <!-- Submissions Viewer Console -->
+    <section class="contact-section" style="margin-top: 40px; padding-bottom: 40px;">
+      <div class="contact-card" style="padding: 40px; max-width: 900px; border-color: var(--border-hover);">
+        <h3 class="contact-title" style="font-size: 16px; margin-bottom: 20px;">Local Submissions Console</h3>
+        <p style="text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 20px;">
+          Because this website runs entirely client-side without a remote server, contact form data is safely saved inside your browser's <code>localStorage</code> database under the key <code>contact_submissions</code>.
+        </p>
+        <button id="btnToggleInbox" class="btn-primary" style="align-self: center; cursor: none; padding: 12px 24px; font-size: 9px;">
+          <span class="btn-text">Show Message Inbox (0)</span>
+        </button>
+        <div id="inboxWrapper" style="display: none; margin-top: 30px; overflow-x: auto; width: 100%;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border); color: var(--primary); font-family: 'Montserrat', sans-serif; font-size: 11px;">
+                <th style="padding: 12px 10px;">Date</th>
+                <th style="padding: 12px 10px;">Name</th>
+                <th style="padding: 12px 10px;">Email</th>
+                <th style="padding: 12px 10px;">Message</th>
+              </tr>
+            </thead>
+            <tbody id="inboxTableBody" style="color: var(--ink);">
+              <!-- Hydrated from localStorage -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <span class="footer-text">&copy; 2026 CODE CRAFT</span>
+    <a href="projects.html" class="footer-link">Back to Projects -></a>
+  </footer>
+
+  <script src="shared.js"></script>
+  <script>
+    const contactForm = document.getElementById('contactForm');
+    const successMsg = document.getElementById('successMsg');
+    const btnToggleInbox = document.getElementById('btnToggleInbox');
+    const inboxWrapper = document.getElementById('inboxWrapper');
+    const inboxTableBody = document.getElementById('inboxTableBody');
+
+    // Submissions Handler
+    if (contactForm && successMsg) {
+      contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('clientName').value;
+        const email = document.getElementById('clientEmail').value;
+        const message = document.getElementById('clientMessage').value;
+
+        const submissions = JSON.parse(localStorage.getItem('contact_submissions') || '[]');
+        submissions.push({ name, email, message, date: new Date().toISOString() });
+        localStorage.setItem('contact_submissions', JSON.stringify(submissions));
+
+        contactForm.style.opacity = '0';
+        setTimeout(() => {
+          contactForm.style.display = 'none';
+          successMsg.style.display = 'block';
+          updateInboxUI();
+        }, 400);
+      });
+    }
+
+    function updateInboxUI() {
+      const submissions = JSON.parse(localStorage.getItem('contact_submissions') || '[]');
+      btnToggleInbox.querySelector('.btn-text').textContent = `Show Message Inbox (${submissions.length})`;
+      
+      if (submissions.length === 0) {
+        inboxTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px; color: var(--muted);">No messages in localStorage. Send a message to test!</td></tr>`;
+      } else {
+        inboxTableBody.innerHTML = submissions.map(s => {
+          const date = new Date(s.date).toLocaleDateString() + ' ' + new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+          return `
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 12px 10px; font-family: 'Fira Code', monospace; font-size: 11px; white-space: nowrap;">${date}</td>
+              <td style="padding: 12px 10px; font-weight: 500;">${s.name}</td>
+              <td style="padding: 12px 10px; color: var(--primary-dark);">${s.email}</td>
+              <td style="padding: 12px 10px; color: var(--muted);">${s.message}</td>
+            </tr>
+          `;
+        }).join('\n');
+      }
+    }
+
+    // Toggle inbox panel
+    btnToggleInbox.addEventListener('click', () => {
+      const isVisible = inboxWrapper.style.display === 'block';
+      if (isVisible) {
+        inboxWrapper.style.display = 'none';
+        btnToggleInbox.querySelector('.btn-text').textContent = btnToggleInbox.querySelector('.btn-text').textContent.replace('Hide', 'Show');
+      } else {
+        inboxWrapper.style.display = 'block';
+        btnToggleInbox.querySelector('.btn-text').textContent = btnToggleInbox.querySelector('.btn-text').textContent.replace('Show', 'Hide');
+      }
+    });
+
+    // Populate console on load
+    updateInboxUI();
+  </script>
+
+</body>
+</html>
