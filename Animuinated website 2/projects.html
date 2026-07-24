@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects - CODE CRAFT</title>
+  <meta name="description" content="Browse featured projects and community uploads at CODE CRAFT developer studio.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- Grid Overlay -->
+  <div class="grid-overlay"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar-logo">CODE CRAFT</a>
+    <ul class="navbar-links">
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="register.html" class="nav-btn">Register / Upload</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="page-container">
+    <div class="page-header">
+      <h1 class="page-title">Featured Projects</h1>
+      <p class="page-subtitle">Explore a curated collection of developer-crafted projects, from pixel-perfect interfaces to robust backend systems.</p>
+    </div>
+
+    <section class="portfolio-section">
+      <div class="portfolio-grid" id="projectsGrid">
+        <!-- Dynamically hydrated -->
+      </div>
+    </section>
+  </div>
+
+  <!-- Fullscreen Code Explorer & Sandbox Modal -->
+  <div class="explorer-modal" id="explorerModal">
+    <button class="explorer-close" id="btnCloseExplorer">x</button>
+    <div class="explorer-container">
+      <div class="explorer-sidebar">
+        <div class="sidebar-title" id="explorerProjTitle">Workspace Files</div>
+        <ul class="file-list" id="explorerFileList">
+          <!-- Dynamically populated files -->
+        </ul>
+      </div>
+      <div class="explorer-main">
+        <div class="explorer-header">
+          <div class="active-file-title" id="activeFileTitle">Select a file...</div>
+          <div class="explorer-tabs" id="explorerTabsContainer" style="display: none;">
+            <button class="explorer-tab-btn active" id="btnTabCode">Code Viewer</button>
+            <button class="explorer-tab-btn" id="btnTabPreview">Live Preview</button>
+          </div>
+        </div>
+        <div class="explorer-viewport">
+          <pre class="code-viewer-pre" id="codeViewer"><code id="codeBlock">Select a code file from the workspace explorer to inspect its source code.</code></pre>
+          <iframe class="sandbox-iframe" id="sandboxIframe" sandbox="allow-scripts allow-modals"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <span class="footer-text">&copy; 2026 CODE CRAFT</span>
+    <a href="register.html" class="footer-link">Upload Your Project -></a>
+  </footer>
+
+  <script src="shared.js"></script>
+  <script>
+    const FALLBACK_PROJECTS = [
+      { "id": "01", "name": "ReactFlow", "category": "Frontend Development", "image": "code_frontend.png" },
+      { "id": "02", "name": "NodeForge", "category": "Backend & API Systems", "image": "code_backend.png" },
+      { "id": "03", "name": "CloudPipe", "category": "DevOps & CI/CD", "image": "chronos.png" },
+      { "id": "04", "name": "NeuralNet", "category": "AI & Machine Learning", "image": "nexus.png" }
+    ];
+
+    let allProjectsList = [];
+    let currentExplorerProject = null;
+    let activeBlobURL = '';
+
+    async function loadProjects() {
+      let staticProjects;
+      try {
+        const res = await fetch('data/projects.json');
+        if (!res.ok) throw new Error();
+        staticProjects = await res.json();
+      } catch (e) {
+        staticProjects = FALLBACK_PROJECTS;
+      }
+
+      const userProjects = JSON.parse(localStorage.getItem('uploaded_projects') || '[]');
+      allProjectsList = [...staticProjects, ...userProjects];
+
+      const grid = document.getElementById('projectsGrid');
+      if (!grid) return;
+
+      grid.innerHTML = allProjectsList.map(p => {
+        const isUploaded = p.files && p.files.length > 0;
+        const uploadTag = isUploaded ? `<span class="card-upload-ribbon">Folder Upload</span>` : '';
+        const exploreButton = isUploaded 
+          ? `<button class="explore-btn" onclick="openCodeExplorer('${p.id}')">Explore & Run</button>` 
+          : '';
+
+        return `
+          <div class="portfolio-card">
+            ${uploadTag}
+            <div class="portfolio-card-bg" style="background-image: url('${p.image}')"></div>
+            <div class="portfolio-meta">
+              <span class="portfolio-num">[ ${p.id} ]</span>
+              <h3 class="portfolio-name">${p.name}</h3>
+              <span class="portfolio-category">${p.category}</span>
+              ${exploreButton}
+            </div>
+          </div>
+        `;
+      }).join('\n');
+    }
+
+    /* ── Code Explorer Functions ── */
+    window.openCodeExplorer = function (projId) {
+      const project = allProjectsList.find(p => p.id === projId);
+      if (!project || !project.files || project.files.length === 0) return;
+
+      currentExplorerProject = project;
+      
+      const modal = document.getElementById('explorerModal');
+      const projTitle = document.getElementById('explorerProjTitle');
+      const fileList = document.getElementById('explorerFileList');
+      const tabsContainer = document.getElementById('explorerTabsContainer');
+      
+      projTitle.textContent = project.name;
+      fileList.innerHTML = '';
+      
+      // Check if folder contains index.html for Live Preview tab unlocking
+      const hasIndexHtml = project.files.some(f => f.path.toLowerCase().endsWith('index.html'));
+      tabsContainer.style.display = hasIndexHtml ? 'flex' : 'none';
+
+      // Build file explorer tree items
+      project.files.forEach((file, index) => {
+        const li = document.createElement('li');
+        li.className = 'file-item';
+        
+        // Display only filename or full webkitRelativePath
+        const cleanPath = file.path.substring(file.path.indexOf('/') + 1);
+        const icon = file.isBinary ? 'IMG' : 'FILE';
+        
+        li.innerHTML = `<span class="file-icon">${icon}</span> ${cleanPath}`;
+        li.addEventListener('click', () => selectFile(index));
+        fileList.appendChild(li);
+      });
+
+      // Show modal
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // Default back to first tab (Code view)
+      switchTab('code');
+
+      // Select first file automatically if available
+      if (project.files.length > 0) {
+        selectFile(0);
+      }
+    };
+
+    function selectFile(fileIndex) {
+      if (!currentExplorerProject) return;
+      
+      const file = currentExplorerProject.files[fileIndex];
+      const items = document.querySelectorAll('.file-item');
+      items.forEach((item, idx) => {
+        if (idx === fileIndex) item.classList.add('active');
+        else item.classList.remove('active');
+      });
+
+      const activeFileTitle = document.getElementById('activeFileTitle');
+      const codeBlock = document.getElementById('codeBlock');
+      
+      const cleanPath = file.path.substring(file.path.indexOf('/') + 1);
+      activeFileTitle.textContent = cleanPath;
+
+      if (file.isBinary) {
+        codeBlock.textContent = `[ Binary Asset / Image: Click Live Preview to view dynamic folder run ]`;
+      } else {
+        codeBlock.textContent = file.content;
+      }
+      
+      // Auto switch back to code tab when a file is clicked
+      switchTab('code');
+    }
+
+    function switchTab(tab) {
+      const btnTabCode = document.getElementById('btnTabCode');
+      const btnTabPreview = document.getElementById('btnTabPreview');
+      const codeViewer = document.getElementById('codeViewer');
+      const iframe = document.getElementById('sandboxIframe');
+
+      if (tab === 'code') {
+        btnTabCode.classList.add('active');
+        btnTabPreview.classList.remove('active');
+        codeViewer.style.display = 'block';
+        iframe.style.display = 'none';
+      } else {
+        btnTabPreview.classList.add('active');
+        btnTabCode.classList.remove('active');
+        codeViewer.style.display = 'none';
+        iframe.style.display = 'block';
+
+        // Compile and run code inside sandbox iframe
+        runIframeSandbox();
+      }
+    }
+
+    function runIframeSandbox() {
+      if (!currentExplorerProject || !currentExplorerProject.files) return;
+      const iframe = document.getElementById('sandboxIframe');
+      
+      // Clean up previous blob URL
+      if (activeBlobURL) {
+        URL.revokeObjectURL(activeBlobURL);
+        activeBlobURL = '';
+      }
+
+      // 1. Locate index.html
+      const indexFile = currentExplorerProject.files.find(f => f.path.toLowerCase().endsWith('index.html'));
+      if (!indexFile) return;
+
+      let htmlContent = indexFile.content;
+
+      // 2. Inline Stylesheets
+      // Match relative stylesheet calls: href="style.css" or href="./css/style.css" etc.
+      const cssRegex = /<link[^>]+rel=["']stylesheet["'][^>]+href=["']([^"']+)["'][^>]*>/gi;
+      htmlContent = htmlContent.replace(cssRegex, (match, href) => {
+        // Resolve filename
+        const filename = href.split('/').pop();
+        const cssFile = currentExplorerProject.files.find(f => f.path.endsWith(filename));
+        if (cssFile) {
+          return `<style>${cssFile.content}</style>`;
+        }
+        return ''; // strip broken stylesheets
+      });
+
+      // 3. Inline Scripts
+      const scriptRegex = /<script[^>]+src=["']([^"']+)["'][^>]*>\s*<\/script>/gi;
+      htmlContent = htmlContent.replace(scriptRegex, (match, src) => {
+        const filename = src.split('/').pop();
+        const jsFile = currentExplorerProject.files.find(f => f.path.endsWith(filename));
+        if (jsFile) {
+          return `<script>${jsFile.content}<\/script>`;
+        }
+        return ''; // strip broken scripts
+      });
+
+      // 4. Inline Images
+      const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+      htmlContent = htmlContent.replace(imgRegex, (match, src) => {
+        // Skip base64 strings or remote urls
+        if (src.startsWith('data:') || src.startsWith('http://') || src.startsWith('https://')) {
+          return match;
+        }
+        const filename = src.split('/').pop();
+        const imgFile = currentExplorerProject.files.find(f => f.path.endsWith(filename));
+        if (imgFile && imgFile.isBinary) {
+          return match.replace(src, imgFile.content);
+        }
+        return match;
+      });
+
+      // 5. Build Blob and inject to sandbox iframe
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      activeBlobURL = URL.createObjectURL(blob);
+      iframe.src = activeBlobURL;
+    }
+
+    // Modal Close Triggers
+    const btnCloseExplorer = document.getElementById('btnCloseExplorer');
+    if (btnCloseExplorer) {
+      btnCloseExplorer.addEventListener('click', () => {
+        const modal = document.getElementById('explorerModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        
+        // Clean iframe src & active blob URLs
+        const iframe = document.getElementById('sandboxIframe');
+        iframe.src = 'about:blank';
+        if (activeBlobURL) {
+          URL.revokeObjectURL(activeBlobURL);
+          activeBlobURL = '';
+        }
+        currentExplorerProject = null;
+      });
+    }
+
+    // Modal Tab click handlers
+    document.getElementById('btnTabCode').addEventListener('click', () => switchTab('code'));
+    document.getElementById('btnTabPreview').addEventListener('click', () => switchTab('preview'));
+
+    window.addEventListener('DOMContentLoaded', loadProjects);
+  </script>
+
+</body>
+</html>
