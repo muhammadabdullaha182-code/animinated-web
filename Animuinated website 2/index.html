@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CODE CRAFT - Developer Studio</title>
+  <meta name="description" content="CODE CRAFT is a developer studio crafting clean software, portfolio projects, and custom digital systems.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar-logo">CODE CRAFT</a>
+    <ul class="navbar-links">
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="register.html" class="nav-btn">Register / Upload</a></li>
+    </ul>
+  </nav>
+
+  <header class="masthead">
+    <div class="masthead-inner">
+      <img class="masthead-avatar" src="aether.png" alt="CODE CRAFT developer workspace preview">
+      <div class="hero-3d-stage" aria-hidden="true">
+        <div class="hero-3d-orbit hero-3d-orbit-a"></div>
+        <div class="hero-3d-orbit hero-3d-orbit-b"></div>
+        <div class="hero-3d-cube">
+          <span class="cube-face cube-front">CODE</span>
+          <span class="cube-face cube-back">BUILD</span>
+          <span class="cube-face cube-right">DEBUG</span>
+          <span class="cube-face cube-left">DEPLOY</span>
+          <span class="cube-face cube-top">STACK</span>
+          <span class="cube-face cube-bottom">SCRIPT</span>
+        </div>
+      </div>
+      <h1>CODE CRAFT</h1>
+      <div class="theme-divider theme-divider-light">
+        <span></span>
+        <strong>*</strong>
+        <span></span>
+      </div>
+      <p>Frontend Development - Backend Systems - AI Automation</p>
+      <div class="masthead-actions">
+        <a href="projects.html" class="btn-primary">View Projects</a>
+        <a href="contact.html" class="btn-outline">Start a Project</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-section portfolio-home" id="portfolio">
+      <div class="section-container">
+        <h2 class="page-section-heading">Featured Projects</h2>
+        <div class="theme-divider">
+          <span></span>
+          <strong>*</strong>
+          <span></span>
+        </div>
+        <div class="portfolio-grid" id="projectsGrid">
+          <!-- Dynamically hydrated from data/projects.json -->
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section about-band" id="about">
+      <div class="section-container">
+        <h2 class="page-section-heading">About</h2>
+        <div class="theme-divider theme-divider-light">
+          <span></span>
+          <strong>*</strong>
+          <span></span>
+        </div>
+        <div class="about-columns" id="aboutContent">
+          <p>I write clean, scalable code and architect robust systems from pixel-perfect frontends to high-performance backends.</p>
+          <p>Every function is optimized, every API is reliable, and every deployment is built with a practical path to production.</p>
+        </div>
+        <div class="section-actions">
+          <a href="register.html" class="btn-outline">Upload Your Project</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section contact-preview">
+      <div class="section-container narrow">
+        <h2 class="page-section-heading">Ready To Build?</h2>
+        <div class="theme-divider">
+          <span></span>
+          <strong>*</strong>
+          <span></span>
+        </div>
+        <p class="lead-text">Bring a project idea, custom website, automation workflow, or fullstack platform. CODE CRAFT can turn it into a working digital product.</p>
+        <a href="contact.html" class="btn-primary">Contact CODE CRAFT</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span class="footer-text">&copy; 2026 CODE CRAFT</span>
+    <a href="projects.html" class="footer-link">Portfolio</a>
+  </footer>
+
+  <script src="shared.js"></script>
+  <script>
+    (function () {
+      const FALLBACK_PROFILE = {
+        logo: "CODE CRAFT",
+        about: {
+          paragraphs: [
+            "I write clean, scalable code and architect robust systems from pixel-perfect frontends to high-performance backends.",
+            "Every function is optimized, every API is reliable, and every deployment is built with a practical path to production."
+          ]
+        }
+      };
+
+      const FALLBACK_PROJECTS = [
+        { id: "01", name: "ReactFlow", category: "Frontend Development", image: "code_frontend.png" },
+        { id: "02", name: "NodeForge", category: "Backend & API Systems", image: "code_backend.png" },
+        { id: "03", name: "CloudPipe", category: "DevOps & CI/CD", image: "chronos.png" },
+        { id: "04", name: "NeuralNet", category: "AI & Machine Learning", image: "nexus.png" }
+      ];
+
+      async function fetchData(url, fallback) {
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error("Unable to load data.");
+          return await response.json();
+        } catch (error) {
+          return fallback;
+        }
+      }
+
+      async function hydrateHome() {
+        const profile = await fetchData("data/profile.json", FALLBACK_PROFILE);
+        const projects = await fetchData("data/projects.json", FALLBACK_PROJECTS);
+
+        document.querySelectorAll(".navbar-logo").forEach((logo) => {
+          logo.textContent = profile.logo || "CODE CRAFT";
+        });
+
+        const aboutContent = document.getElementById("aboutContent");
+        if (aboutContent && profile.about && Array.isArray(profile.about.paragraphs)) {
+          aboutContent.innerHTML = profile.about.paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("");
+        }
+
+        const projectsGrid = document.getElementById("projectsGrid");
+        if (projectsGrid) {
+          projectsGrid.innerHTML = projects.map((project) => `
+            <article class="portfolio-card">
+              <div class="portfolio-card-bg" style="background-image: url('${project.image}')"></div>
+              <div class="portfolio-card-caption">
+                <span class="portfolio-num">${project.id}</span>
+                <h3 class="portfolio-name">${project.name}</h3>
+                <p class="portfolio-category">${project.category}</p>
+              </div>
+            </article>
+          `).join("");
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", hydrateHome);
+    })();
+  </script>
+</body>
+
+</html>
