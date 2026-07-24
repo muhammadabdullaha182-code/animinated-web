@@ -1,0 +1,26 @@
+[
+  {
+    "category": "Frontend Craft",
+    "skills": [
+      { "name": "React / Next.js", "level": 95, "desc": "Server-side rendering, context API, custom hooks, and optimized client bundles." },
+      { "name": "TypeScript", "level": 90, "desc": "Strict type safety, robust interface structures, and generic code design." },
+      { "name": "WebGL / Three.js", "level": 80, "desc": "Interactive 3D graphic rendering, custom shaders, and particle systems." }
+    ]
+  },
+  {
+    "category": "Backend Engineering",
+    "skills": [
+      { "name": "Node.js / Express", "level": 92, "desc": "Asynchronous API architectures, middleware design, and secure authentication." },
+      { "name": "Go (Golang)", "level": 85, "desc": "High-performance concurrency, microservices, and fast execution routines." },
+      { "name": "GraphQL", "level": 88, "desc": "Flexible schema definitions, efficient query mapping, and data federation." }
+    ]
+  },
+  {
+    "category": "Cloud & Operations",
+    "skills": [
+      { "name": "Docker & K8s", "level": 85, "desc": "Containerizing applications and scaling microservices orchestrations." },
+      { "name": "AWS / GCP", "level": 82, "desc": "Serverless architectures, VPC configs, and secure IAM credentials." },
+      { "name": "GitHub Actions", "level": 90, "desc": "CI/CD automated build tasks, testing suite, and immediate deployments." }
+    ]
+  }
+]
