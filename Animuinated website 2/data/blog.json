@@ -1,0 +1,23 @@
+[
+  {
+    "title": "Optimizing Scroll Animations on the GPU",
+    "category": "Performance",
+    "date": "July 12, 2026",
+    "readTime": "4 min read",
+    "snippet": "Why running heavy Javascript loops on scroll causes frames to stutter, and how offloading transitions to GPU-accelerated CSS custom variables keeps UI rendering at a locked 60 FPS."
+  },
+  {
+    "title": "Architecting Scalable Microservices in Go",
+    "category": "System Design",
+    "date": "June 28, 2026",
+    "readTime": "6 min read",
+    "snippet": "A deep dive into building modular Go backend APIs. Understanding channels, goroutines, clean architecture, and lightweight container deployments."
+  },
+  {
+    "title": "WebGL and the Future of Immersive Portfolios",
+    "category": "Creative Coding",
+    "date": "May 15, 2026",
+    "readTime": "5 min read",
+    "snippet": "Exploring how 3D canvases, custom shaders, and particle systems can be integrated into landing pages without compromising load times or accessibility."
+  }
+]
