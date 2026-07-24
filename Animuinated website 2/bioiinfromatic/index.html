@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bioinformatics Student Toolkit</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">Student Lab Tool</p>
+      <h1>Bioinformatics Toolkit</h1>
+      <p class="intro">Analyze DNA, RNA, and protein sequences with fast classroom-friendly calculators.</p>
+    </div>
+    <canvas id="helixCanvas" width="440" height="180" aria-label="Animated DNA helix visualization"></canvas>
+  </header>
+
+  <main class="layout">
+    <section class="workspace" aria-labelledby="sequenceTitle">
+      <div class="panel-heading">
+        <div>
+          <h2 id="sequenceTitle">Sequence Input</h2>
+          <p>Paste a FASTA record or raw sequence. Spaces, numbers, and line breaks are ignored.</p>
+        </div>
+        <div class="controls">
+          <button type="button" id="exampleBtn">Example</button>
+          <button type="button" id="clearBtn" class="secondary">Clear</button>
+        </div>
+      </div>
+
+      <textarea id="sequenceInput" spellcheck="false" placeholder=">sample_dna&#10;ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG"></textarea>
+
+      <div class="option-row">
+        <label for="frameSelect">Translation frame</label>
+        <select id="frameSelect">
+          <option value="0">Frame 1</option>
+          <option value="1">Frame 2</option>
+          <option value="2">Frame 3</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="metrics" aria-label="Sequence summary">
+      <article>
+        <span>Type</span>
+        <strong id="seqType">-</strong>
+      </article>
+      <article>
+        <span>Length</span>
+        <strong id="seqLength">0</strong>
+      </article>
+      <article>
+        <span>GC Content</span>
+        <strong id="gcContent">0%</strong>
+      </article>
+      <article>
+        <span>Mol. Weight</span>
+        <strong id="molWeight">0 Da</strong>
+      </article>
+    </section>
+
+    <section class="tool-grid">
+      <article class="tool-panel">
+        <h2>Sequence Composition</h2>
+        <div class="bars" id="compositionBars"></div>
+      </article>
+
+      <article class="tool-panel">
+        <h2>Reverse Complement</h2>
+        <pre id="reverseComplement">Enter a DNA sequence to calculate its reverse complement.</pre>
+      </article>
+
+      <article class="tool-panel">
+        <h2>DNA to RNA</h2>
+        <pre id="rnaOutput">Enter a DNA sequence to transcribe it.</pre>
+      </article>
+
+      <article class="tool-panel">
+        <h2>Protein Translation</h2>
+        <pre id="proteinOutput">Enter DNA or RNA to translate codons.</pre>
+      </article>
+
+      <article class="tool-panel wide">
+        <h2>Open Reading Frames</h2>
+        <div class="orf-list" id="orfList">No ORFs found yet.</div>
+      </article>
+
+      <article class="tool-panel wide">
+        <h2>Codon Lookup</h2>
+        <div class="codon-lookup">
+          <input id="codonInput" type="text" maxlength="3" placeholder="ATG" aria-label="Codon lookup">
+          <output id="codonOutput">Enter a codon to identify the amino acid.</output>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
