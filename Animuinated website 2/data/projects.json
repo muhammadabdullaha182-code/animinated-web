@@ -1,0 +1,26 @@
+[
+  {
+    "id": "01",
+    "name": "ReactFlow",
+    "category": "Frontend Development",
+    "image": "code_frontend.png"
+  },
+  {
+    "id": "02",
+    "name": "NodeForge",
+    "category": "Backend & API Systems",
+    "image": "code_backend.png"
+  },
+  {
+    "id": "03",
+    "name": "CloudPipe",
+    "category": "DevOps & CI/CD",
+    "image": "chronos.png"
+  },
+  {
+    "id": "04",
+    "name": "NeuralNet",
+    "category": "AI & Machine Learning",
+    "image": "nexus.png"
+  }
+]
